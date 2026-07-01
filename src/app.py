@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from model_load import load_model
+#from model_load import load_model
 from typing import Optional, Any
 import time
 
@@ -82,7 +82,7 @@ def query(req: QueryRequest):
 
     start = time.time()
     try:
-        model, tokenizer = load_model()
+       # model, tokenizer = load_model()
         if req.use_verification:
             result = answer_with_verification(
                 req.question, retriever,model = model, tokenizer= tokenizer, top_k=req.top_k
