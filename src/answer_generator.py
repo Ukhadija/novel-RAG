@@ -47,6 +47,3 @@ def generate_answer_v2(query, retriever, top_k=5, max_new_tokens=400):
     )
     return {"query": query, "answer": response, "retrieved_chunks": retrieved}
 
-result_v2 = generate_answer_v2("Who is Anne Shirley and what is she like?", retriever)
-print(result_v2["answer"])
-log_result(result_v2, run_name="baseline_fewshot")
