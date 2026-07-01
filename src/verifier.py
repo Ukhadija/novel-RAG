@@ -1,5 +1,6 @@
 import json
 from answer_generator import generate_answer_v2
+import torch
 def build_verifier_prompt(query, draft_answer, retrieved_chunks):
     context_blocks = []
     for c in retrieved_chunks:

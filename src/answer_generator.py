@@ -1,3 +1,4 @@
+import torch
 def build_prompt_fewshot(query, retrieved_chunks):
     context_blocks = []
     for c in retrieved_chunks:
