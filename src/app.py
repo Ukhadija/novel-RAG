@@ -15,7 +15,7 @@ tokenizer: Any = None
 retriever: Any = None
 generate_answer_v2: Any = None
 answer_with_verification: Any = None
-evaluate_single_fn: Any = None  # Renamed internally to avoid collision with endpoint name
+evaluate_single_fn: Any = None 
 
 
 # --- Pydantic Schemas ---
@@ -128,7 +128,7 @@ def eval_single(req: EvalRequest):
         raise HTTPException(status_code=503, detail="Evaluation engine function not injected.")
     try:
         item = req.dict()
-        result = evaluate_single_fn(item, retriever, model, tokenizer, use_verification=True)
+        result = evaluate_single_fn(item, retriever, model = model, tokenizer = tokenizer, use_verification=True)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
