@@ -95,7 +95,7 @@ def answer_with_verification(query, retriever,model, tokenizer, max_retries=1, t
             })
             break
 
-        verdict_obj = run_verifier(query, draft["answer"], draft["retrieved_chunks"], tokenizer=tokenizer)
+        verdict_obj = run_verifier(query, draft["answer"],tokenizer, draft["retrieved_chunks"])
         trace.append({
             "stage": "initial", "attempt": attempt, "top_k_used": current_top_k,
             "draft_answer": draft["answer"], "verdict": verdict_obj["verdict"],
@@ -117,7 +117,7 @@ def answer_with_verification(query, retriever,model, tokenizer, max_retries=1, t
         and reverify_count < max_edit_reverifications
     ):
         candidate_answer = verdict_obj["revised_answer"]
-        reverify_obj = run_verifier(query, candidate_answer, draft["retrieved_chunks"], tokenizer=tokenizer)
+        reverify_obj = run_verifier(query, candidate_answer, tokenizer, draft["retrieved_chunks"])
         trace.append({
             "stage": "edit_reverification",
             "attempt": reverify_count,
