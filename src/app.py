@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import Optional
+from typing import Optional, Any
 import time
 
 app = FastAPI(
@@ -9,6 +9,15 @@ app = FastAPI(
     version="1.0.0",
 )
 
+model: Any = None
+tokenizer: Any = None
+retriever: Any = None
+generate_answer_v2: Any = None
+answer_with_verification: Any = None
+evaluate_single_fn: Any = None  # Renamed internally to avoid collision with endpoint name
+
+
+# --- Pydantic Schemas ---
 class QueryRequest(BaseModel):
     question: str
     top_k: Optional[int] = 5
@@ -42,15 +51,17 @@ class HealthResponse(BaseModel):
     chunks_loaded: int
 
 
-# Endpoints
+# --- Endpoints ---
 
 @app.get("/health", response_model=HealthResponse)
 def health():
+    if retriever is None or model is None:
+        raise HTTPException(status_code=503, detail="Pipeline components not fully initialized or injected.")
     try:
         n_chunks = len(retriever.chunks)
         model_ok = model is not None
-    except Exception:
-        raise HTTPException(status_code=503, detail="Pipeline not initialized")
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Pipeline error: {str(e)}")
     return HealthResponse(
         status="ok",
         model_loaded=model_ok,
@@ -62,6 +73,11 @@ def health():
 def query(req: QueryRequest):
     if not req.question.strip():
         raise HTTPException(status_code=400, detail="Question cannot be empty.")
+    
+    if req.use_verification and not answer_with_verification:
+        raise HTTPException(status_code=503, detail="Verification engine function not injected.")
+    if not req.use_verification and not generate_answer_v2:
+        raise HTTPException(status_code=503, detail="Generation engine v2 function not injected.")
 
     start = time.time()
     try:
@@ -106,6 +122,11 @@ def query(req: QueryRequest):
 
 @app.post("/eval")
 def eval_single(req: EvalRequest):
-    item = req.dict()
-    result = evaluate_single(item, retriever, use_verification=True)
-    return result
+    if not evaluate_single_fn:
+        raise HTTPException(status_code=503, detail="Evaluation engine function not injected.")
+    try:
+        item = req.dict()
+        result = evaluate_single_fn(item, retriever, use_verification=True)
+        return result
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
