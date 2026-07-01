@@ -128,7 +128,7 @@ def eval_single(req: EvalRequest):
         raise HTTPException(status_code=503, detail="Evaluation engine function not injected.")
     try:
         item = req.dict()
-        result = evaluate_single_fn(item, retriever, use_verification=True)
+        result = evaluate_single_fn(item, retriever, model, tokenizer, use_verification=True)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

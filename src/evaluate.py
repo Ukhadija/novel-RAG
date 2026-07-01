@@ -1,11 +1,11 @@
 import time
 from verifier import answer_with_verification
 from answer_generator import generate_answer_v2
-def evaluate_single(item, retriever, use_verification=True):
+def evaluate_single(item, retriever,model, tokenizer, use_verification=True):
     start = time.time()
 
     if use_verification:
-        result = answer_with_verification(item["query"], retriever)
+        result = answer_with_verification(item["query"], retriever, model, tokenizer)
         final_answer = result["final_answer"]
         verdict = result["final_verdict"]
         trace = result["trace"]
