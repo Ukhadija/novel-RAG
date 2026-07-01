@@ -40,7 +40,7 @@ def build_verifier_prompt(query, draft_answer, retrieved_chunks):
     return system_prompt, user_prompt
 
 
-def run_verifier(query, draft_answer, retrieved_chunks, max_new_tokens=400):
+def run_verifier(query, draft_answer,tokenizer, retrieved_chunks, max_new_tokens=400):
     system_prompt, user_prompt = build_verifier_prompt(query, draft_answer, retrieved_chunks)
     messages = [
         {"role": "system", "content": system_prompt},
@@ -95,7 +95,7 @@ def answer_with_verification(query, retriever,model, tokenizer, max_retries=1, t
             })
             break
 
-        verdict_obj = run_verifier(query, draft["answer"], draft["retrieved_chunks"])
+        verdict_obj = run_verifier(query, draft["answer"], draft["retrieved_chunks"], tokenizer=tokenizer)
         trace.append({
             "stage": "initial", "attempt": attempt, "top_k_used": current_top_k,
             "draft_answer": draft["answer"], "verdict": verdict_obj["verdict"],
@@ -117,7 +117,7 @@ def answer_with_verification(query, retriever,model, tokenizer, max_retries=1, t
         and reverify_count < max_edit_reverifications
     ):
         candidate_answer = verdict_obj["revised_answer"]
-        reverify_obj = run_verifier(query, candidate_answer, draft["retrieved_chunks"])
+        reverify_obj = run_verifier(query, candidate_answer, draft["retrieved_chunks"], tokenizer=tokenizer)
         trace.append({
             "stage": "edit_reverification",
             "attempt": reverify_count,
