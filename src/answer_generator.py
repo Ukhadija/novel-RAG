@@ -28,7 +28,7 @@ def build_prompt_fewshot(query, retrieved_chunks):
     return system_prompt, user_prompt
 
 
-def generate_answer_v2(query, retriever, top_k=5, max_new_tokens=400):
+def generate_answer_v2(query, retriever,tokenizer,model, top_k=5, max_new_tokens=400):
     retrieved = retriever.search(query, top_k=top_k)
     system_prompt, user_prompt = build_prompt_fewshot(query, retrieved)
 

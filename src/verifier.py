@@ -71,14 +71,14 @@ def run_verifier(query, draft_answer, retrieved_chunks, max_new_tokens=400):
 
     return parsed
 
-def answer_with_verification(query, retriever, max_retries=1, top_k=5, max_edit_reverifications=1):
+def answer_with_verification(query, retriever,model, tokenizer, max_retries=1, top_k=5, max_edit_reverifications=1):
     trace = []
     current_top_k = top_k
     attempt = 0
     REFUSAL_PHRASE = "I don't have enough information"
 
     while True:
-        draft = generate_answer_v2(query, retriever, top_k=current_top_k)
+        draft = generate_answer_v2(query, retriever,model = model, tokenizer=tokenizer, top_k=current_top_k)
 
         if REFUSAL_PHRASE in draft["answer"]:
             verdict_obj = {
